@@ -7,8 +7,10 @@
     "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
     "build": "tsc",
     "start": "node dist/main.js",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:generate": "drizzle-kit generate --config=src/drizzle.config.ts",
+    "db:migrate": "drizzle-kit migrate --config=src/drizzle.config.ts",
+    "db:push": "drizzle-kit push --config=src/drizzle.config.ts",
+    "db:studio": "drizzle-kit studio --config=src/drizzle.config.ts"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +30,9 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.0.9",
+    "@types/pg": "^8.16.0",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "drizzle-kit": "^0.31.8",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
