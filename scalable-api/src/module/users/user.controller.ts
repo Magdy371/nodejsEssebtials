@@ -1,32 +1,47 @@
 import { UserService } from "./user.service";
-import type { Request, Response  } from "express";
+import { Controller, Route, Get, Post, Patch, Delete, Body, Path, Tags, SuccessResponse } from "tsoa";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
-export class UserController {
-    constructor(private userService: UserService) {}
-    create  = async (req: Request, res: Response) => {
-        const user = await this.userService.create(req.body);
-        res.status(201).json(user);
+@Route("/users")
+@Tags("Users")
+export class UserController extends Controller {
+    private userService: UserService;
+    constructor() {
+        super();
+        this.userService = new UserService();
     }
 
-    findOne = async (req: Request, res: Response) => {
-        const id = req.params.id as string;
+    @Post()
+    @SuccessResponse("201", "Created") 
+    async create (@Body() body: CreateUserDto) {
+        const user = await this.userService.create(body);
+        this.setStatus(201);
+        return user;
+    }
+
+    /**
+     * Get a specific user by ID
+     * TSOA uses the @Path decorator to map the {id} in the route to the function argument.
+     */
+    @Get("{id}")
+    async findOne (@Path() id: string) { // REMOVED: (req: Request, res: Response)
         const foundUser = await this.userService.findOne(id);
-        res.status(200).json(foundUser);
+        return foundUser; // RETURN: directly return the data
     }
 
-    findAll = async (req: Request, res: Response) => {
-        const users = await this.userService.findAll();
-        res.status(200).json(users);
+    @Get()
+    async findAll (){
+        return await this.userService.findAll();
     }
 
-    update = async (req: Request, res: Response) => {
-        const id = req.params.id as string;
-        const user = await this.userService.update(id, req.body);
-        res.status(200).json(user);
+    @Patch("{id}")
+    async update (@Path() id: string, @Body() body: UpdateUserDto) { // CHANGED: @Query to @Path
+        return await this.userService.update(id, body);
     }
-    delete = async (req: Request, res: Response) => {
-        const id = req.params.id as string;
-        const user = await this.userService.delete(id);
-        res.status(200).json(user);
+
+    @Delete("{id}")
+    async delete (@Path() id: string) { // CHANGED: @Query to @Path
+        return await this.userService.delete(id);
     }
 }

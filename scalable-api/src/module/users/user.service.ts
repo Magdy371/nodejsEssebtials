@@ -16,12 +16,8 @@ export class UserService {
                 eq(users.phone, dto.phone),
             )
         ).limit(1);
-        if(existing_fields){
-            if (existing_fields[0].phone){
-                throw new Error(`User with same phone already exists`);
-            }else if(existing_fields[0].email){
-                throw new Error(`User with same email already exists`);
-            }
+        if(existing_fields.length > 0){
+            throw new Error(`User with same phone or name already exists`);
         }
         const createdUser = await database.insert(users).values(dto).returning();
         return createdUser;
@@ -34,6 +30,7 @@ export class UserService {
         }
         return user;
     }
+
     async findAll()
     {
         return await database.select().from(users);
@@ -41,13 +38,18 @@ export class UserService {
 
     async update(id: string, dto: UpdateUserDto){
         await this.findOne(id);
-        const updatedUser = await database.update(users).set({...dto, updatedAt: new Date()});
+        const [updatedUser] = await database.update(users)
+            .set({ ...dto, updatedAt: new Date() })
+            .where(eq(users.id, id))
+            .returning();
         return updatedUser;
     }
 
     async delete(id: string){
         await this.findOne(id);
-        const deletedUser = await database.delete(users).where(eq(users.id, id));
+        const [deletedUser] = await database.delete(users)
+            .where(eq(users.id, id))
+            .returning();
         return deletedUser;
     }
 }
