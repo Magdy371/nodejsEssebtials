@@ -17,7 +17,7 @@ export class UserService {
             )
         ).limit(1);
         if(existing_fields.length > 0){
-            throw new Error(`User with same phone or name already exists`);
+            throw new Error(`User with same email or phone already exists`);
         }
         const createdUser = await database.insert(users).values(dto).returning();
         return createdUser;

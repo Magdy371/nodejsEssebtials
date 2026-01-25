@@ -1,7 +1,8 @@
 import { UserService } from "./user.service";
-import { Controller, Route, Get, Post, Patch, Delete, Body, Path, Tags, SuccessResponse } from "tsoa";
+import { Controller, Route, Get, Post, Patch, Delete, Body, Path, Tags, SuccessResponse, Response, Middlewares } from "tsoa";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { validateBody } from "../../common/middleware/validate.middleware";
 
 @Route("/users")
 @Tags("Users")
@@ -13,7 +14,8 @@ export class UserController extends Controller {
     }
 
     @Post()
-    @SuccessResponse("201", "Created") 
+    @SuccessResponse("201", "Created")
+    @Middlewares(validateBody(CreateUserDto))
     async create (@Body() body: CreateUserDto) {
         const user = await this.userService.create(body);
         this.setStatus(201);
